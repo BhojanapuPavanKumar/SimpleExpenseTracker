@@ -1,0 +1,18 @@
+
+npm create vite@Latest Frontend
+npm install axios
+npm install tailwindcss @tailwindcss/vite
+import "import tailwindcss from '@tailwindcss/vite'" in vite.config.js
+and in plugins ,tailwindcss()
+import "@import "tailwindcss"" in any css file
+added tailwindcss
+
+npm create vite@latest
+npm i
+npm install tailwindcss @tailwindcss/vite
+import tailwindcss from '@tailwindcss/vite' in vite.config.js
+npm i react-router react-icons react-spinners react-loading-skeleton react-toastify axios 
+npm i recharts lucide-react
+
+npm install react-router-dom
+npm install axios react-router react-icons react-spinners react-loading-skeleton react-toastify axios tailwindcss @tailwindcss/vite

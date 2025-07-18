@@ -1,0 +1,23 @@
+MVC--> Model View Controller
+M-> Database
+V-> Frontend
+C-> Backend Logic
+
+=>npm init -y
+=>npm i express mongodb mongoose dotenv cors
+
+express.js--> is applevel middleware
+
+npm i jsonwebtoken bcrypt
+ npm i cookie-parser morgan nodemailer nanoid
+
+
+ in scripts: dev: nodemon app.js
+
+
+ d.t.o(data transfer object)
+ d.a.l(data access layer)
+
+
+ ==>search APP PASSWORD IN GOOGLE
+ npm i express mongodb mongoose dotenv cors jsonwebtoken bcrypt cookie-parser morgan nodemailer nanoid

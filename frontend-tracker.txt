@@ -1,0 +1,56 @@
+expense-tracker-frontend/
+│
+├── public/                             # Static files (index.html, favicon)
+│
+├── src/
+│   ├── assets/                         # Logos, icons, illustrations
+│
+│   ├── components/                     # Reusable UI pieces
+│   │   ├── auth/
+│   │   │   ├── LoginForm.jsx
+│   │   │   └── RegisterForm.jsx
+│   │   ├── dashboard/
+│   │   │   ├── SummaryCard.jsx
+│   │   │   ├── ExpenseBarChart.jsx
+│   │   │   ├── ExpenseItem.jsx
+│   │   │   ├── EmptyState.jsx
+│   │   │   └── AddExpenseButton.jsx
+│   │   ├── profile/
+│   │   │   ├── ProfileInfo.jsx
+│   │   │   ├── EditProfileForm.jsx
+│   │   │   └── ChangePasswordForm.jsx
+│   │   ├── shared/
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── Footer.jsx
+│   │   │   ├── Loader.jsx
+│   │   │   └── ThemeToggle.jsx
+│
+│   ├── pages/                          # Route-level components
+│   │   ├── AuthPage.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── AddExpense.jsx
+│   │   ├── Reports.jsx
+│   │   ├── ProfilePage.jsx             
+│   │   └── NotFound.jsx
+│
+│   ├── context/                        # Global states
+│   │   ├── AuthContext.jsx
+│   │   └── ExpenseContext.jsx
+│
+│   ├── data/
+│   │   └── categories.js
+│
+│   ├── hooks/
+│   │   └── useAuth.js
+│
+│   ├── utils/
+│   │   ├── axiosInstance.js
+│   │   ├── toastHelper.js
+│   │   └── formatDate.js
+│
+│   ├── routes/
+│   │   └── AppRoutes.jsx
+│
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
