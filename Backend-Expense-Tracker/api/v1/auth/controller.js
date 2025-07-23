@@ -97,7 +97,7 @@ const userLoginController = async (req, res) => {
 
     const { password: hashedPassword } = user;
 
-    const isCorrect = bcrypt.compare(password.toString(), hashedPassword);
+    const isCorrect = await bcrypt.compare(password.toString(), hashedPassword);
 
     if (!isCorrect) {
       res.status(400).json({

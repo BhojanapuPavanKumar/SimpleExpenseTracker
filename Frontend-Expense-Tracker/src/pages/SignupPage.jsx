@@ -8,9 +8,11 @@ const SignupPage = () => {
     const [otp, setOtp] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading,setLoading]=useState();
     const navigate = useNavigate();
 
     const handleRegister = async () => {
+      setLoading(true)
         if (isOtpSent) {
             try {
                 if (!email || !password || !otp) {
@@ -38,9 +40,11 @@ const SignupPage = () => {
         } else {
             ErrorToast(`Cannot signup before sending otp`);
         }
+        setLoading(false);
     };
 
     const handleSendOtp = async () => {
+      setLoading(true);
         try {
             const resp = await axiosInstance.post("/auth/send-otp", {
                 email,
@@ -55,6 +59,7 @@ const SignupPage = () => {
             console.log(err);
             ErrorToast(`Cannot send otp: ${err.response?.data?.message || err.message}`);
         }
+        setLoading(false)
     };
 
     return (
@@ -68,6 +73,15 @@ const SignupPage = () => {
       <h2 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-indigo-600 mb-8">
         {isOtpSent ? "Verify & Register" : "Join Us"}
       </h2>
+
+        {loading ? (
+          <h1 className="text-xl font-semibold text-indigo-700 bg-indigo-100 border border-indigo-300 px-6 py-4 rounded-lg shadow-md text-center animate-pulse">
+            Please wait, it takes time to load...
+          </h1>
+        ) : (
+          ""
+        )}
+
 
       <div className="space-y-6">
         <div className="relative">
