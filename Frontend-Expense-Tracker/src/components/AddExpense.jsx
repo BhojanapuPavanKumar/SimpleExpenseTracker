@@ -2,15 +2,18 @@ import { useState } from "react";
 import { axiosInstance } from "../axios/axiosInstance";
 import { SuccessToast, ErrorToast } from "../utils/toastHelper";
 import { useNavigate } from "react-router";
+import { useAppContext } from "../contexts/appContext";
 
 const AddExpense = () => {
     const navigate=useNavigate();
+    const { setAppLoading}=useAppContext();
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [date, setDate] = useState("");
 
   const handleSubmit = async (e) => {
+     setAppLoading(true);
     e.preventDefault();
     if (!title || !amount || !category || !date) {
       ErrorToast("All fields are required");
@@ -18,7 +21,7 @@ const AddExpense = () => {
     }
 
     try {
-      const res = await axiosInstance.post("expense", {
+      const res = await axiosInstance.post("expense/add", {
         title,
         amount,
         category,
@@ -26,6 +29,7 @@ const AddExpense = () => {
       });
 
       if (res.data.isSuccess) {
+         setAppLoading(false);
         SuccessToast("Expense Added Successfully");
         setTitle("");
         setAmount("");
@@ -34,6 +38,7 @@ const AddExpense = () => {
         navigate("/");
       }
     } catch (err) {
+       setAppLoading(false);
       ErrorToast(err?.response?.data?.message || err.message);
     }
   };

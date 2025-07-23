@@ -46,6 +46,7 @@ const AppContextProvider = ({ children }) => {
     const valueObj = {
         appLoading,
         user,
+        setAppLoading,
     };
 
     return <AppContext.Provider value={valueObj}>{children}</AppContext.Provider>;

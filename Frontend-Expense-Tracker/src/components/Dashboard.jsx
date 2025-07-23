@@ -1,146 +1,183 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../axios/axiosInstance";
+import { groupByMonth, groupByYear } from "../utils/groupExpense";
 import { ErrorToast } from "../utils/toastHelper";
-import { useNavigate } from "react-router";
-import { Navbar } from "./navbar";
 import CircularProgressBar from "../components/CircularProgressBar";
+import { useAppContext } from "../contexts/appContext";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const [filter, setFilter] = useState("day");
+  const {setAppLoading}=useAppContext();
+
   const [expenses, setExpenses] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [userBudget, setUserBudget] = useState(10000); // Default budget, user can update
+  const [income, setIncome] = useState([]);
+  const [filter, setFilter] = useState("day");
 
   const fetchExpenses = async () => {
+    setAppLoading(true);
     try {
-      setIsLoading(true);
-      const res = await axiosInstance.get("/expense");
-      console.log("res while fetching", res);
-      if (res.data.isSuccess && res.data.data.length) {
-        setExpenses(res.data.data);
-      } else {
-        setExpenses([]);
-      }
+      const res = await axiosInstance.get("/expense/get");
+      setExpenses(res.data.data || []);
     } catch (err) {
-      ErrorToast(err?.response?.data?.message || err.message || "Failed to fetch expenses");
-    } finally {
-      setIsLoading(false);
+      ErrorToast(`Failed to fetch expenses: ${err.message}`);
+    }
+  };
+
+  const fetchIncome = async () => {
+    setAppLoading(true);
+    try {
+      const res = await axiosInstance.get("/income/get");
+      setIncome(res.data.data || []);
+    } catch (err) {
+      ErrorToast(`Failed to fetch income: ${err.message}`);
     }
   };
 
   useEffect(() => {
     fetchExpenses();
-  }, [filter]);
+    fetchIncome();
+    setAppLoading(false);
+  }, []);
 
-  const totalAmount = expenses.reduce((sum, item) => sum + item.amount, 0);
-  const spentPercentage = userBudget
-    ? Math.min(100, Math.round((totalAmount / userBudget) * 100))
-    : 0;
+  const totalExpense = expenses.reduce((acc, curr) => acc + Number(curr.amount), 0);
+  const totalIncome = income.reduce((acc, curr) => acc + Number(curr.amount), 0);
+  const spentPercentage = totalIncome ? Math.min(100, Math.round((totalExpense / totalIncome) * 100)) : 0;
+  const balancePercentage = 100 - spentPercentage;
 
   return (
-    <>
-      <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-xl text-gray-800">
-        <h2 className="text-3xl font-bold text-center mb-4">Dashboard</h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white p-6">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-teal-500">
+          Expense Dashboard
+        </h1>
 
-        {/* Budget Input */}
-        <div className="flex justify-center gap-2 mb-6">
-          <label htmlFor="budget" className="font-medium mt-2 text-gray-700">
-            Your Budget (₹):
-          </label>
-          <input
-            id="budget"
-            type="number"
-            className="border px-4 py-2 rounded-md w-40 text-right shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-            value={userBudget}
-            onChange={(e) => setUserBudget(Number(e.target.value))}
-            min="0"
-          />
-        </div>
-
-        {/* Filter Buttons */}
-        <div className="flex justify-center gap-4 mb-6">
-          {["day", "month", "year"].map((item) => (
-            <button
-              key={item}
-              className={`px-4 py-2 rounded-md border transition-all shadow-md ${
-                filter === item
-                  ? "bg-blue-600 text-white scale-105"
-                  : "bg-white text-blue-600 border-blue-600 hover:bg-blue-100"
-              }`}
-              onClick={() => setFilter(item)}
-            >
-              {item.charAt(0).toUpperCase() + item.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {/* Circular Progress Bar */}
-        <div className="flex justify-center gap-6 flex-wrap mb-6">
-          <CircularProgressBar percentage={spentPercentage} color="#f97316" label="Budget Used" />
-          <CircularProgressBar percentage={100 - spentPercentage} color="#10b981" label="Remaining" />
-        </div>
-
-        {/* Data Section */}
-        {isLoading ? (
-          <p className="text-center text-gray-500">Loading...</p>
-        ) : expenses.length === 0 ? (
-          <div className="text-center text-gray-600 italic">
-            <p>No expense data available for this {filter}.</p>
-            <p className="mt-2">Start your expense tracking today!</p>
-            <button
-              onClick={() => navigate("/add-expense")}
-              className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md shadow hover:bg-green-600"
-            >
-              Add Item / Grocery
-            </button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 text-center">
+            <h3 className="text-lg font-semibold text-gray-600">Total Income</h3>
+            <p className="text-2xl text-green-600 font-bold">₹{totalIncome}</p>
           </div>
-        ) : (
-          <div>
-            {/* Summary */}
-            <div className="flex justify-between items-center bg-blue-100 rounded-md p-4 mb-6 shadow-inner">
-              <p className="text-lg font-semibold">Total Spent: ₹{totalAmount}</p>
-              <p className="text-sm text-blue-800 italic">
-                Showing {expenses.length} {filter} record{expenses.length > 1 ? "s" : ""}
-              </p>
-            </div>
+          <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 text-center">
+            <h3 className="text-lg font-semibold text-gray-600">Total Expense</h3>
+            <p className="text-2xl text-red-500 font-bold">₹{totalExpense}</p>
+          </div>
+          <div className="flex justify-center gap-4">
+            <CircularProgressBar percentage={spentPercentage} color="#f87171" label="Spent" />
+            <CircularProgressBar percentage={balancePercentage} color="#34d399" label="Remaining" />
+          </div>
+        </div>
 
-            {/* Expense List */}
-            <div className="space-y-3">
-              {expenses.map((item) => (
-                <div
-                  key={item._id}
-                  className="p-4 border rounded-md shadow-sm hover:shadow-md transition"
-                >
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">{item.title}</h3>
-                    <span className="text-blue-600 font-bold">₹{item.amount}</span>
-                  </div>
-                  <p className="text-sm text-gray-600">Category: {item.category}</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(item.date).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </p>
+        <div className="mb-6 flex justify-center">
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          >
+            <option value="day">Day-wise</option>
+            <option value="month">Month-wise</option>
+            <option value="year">Year-wise</option>
+          </select>
+        </div>
+
+        {filter === "day" && expenses.length > 0 && (
+          <div className="bg-white border border-gray-300 rounded-xl p-4 shadow-md space-y-4">
+            {expenses.map((item) => (
+              <div
+                key={item._id}
+                className="p-4 bg-gray-50 border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-semibold text-lg">{item.title}</span>
+                  <span className="font-bold text-red-600">₹{item.amount}</span>
                 </div>
-              ))}
-            </div>
+                <p className="text-sm text-gray-600">{item.category}</p>
+                <p className="text-xs text-gray-500">
+                  {new Date(item.date).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </p>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Add New Expense Button */}
-        <div className="sticky bottom-6 flex justify-center mt-10">
-          <button
-            onClick={() => navigate("/add-expense")}
-            className="bg-gradient-to-r from-green-500 to-lime-500 hover:from-green-600 hover:to-lime-600 text-white px-6 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
-          >
-            ➕ Add New Expense
-          </button>
-        </div>
+        {filter === "month" &&
+          Object.entries(groupByMonth(expenses)).map(([month, items]) => (
+            <div
+              key={month}
+              className="mb-6 border-2 border-blue-300 bg-blue-50 rounded-xl shadow-sm p-4"
+            >
+              <h3 className="text-xl font-bold text-blue-800 mb-3 underline underline-offset-4">
+                {month}
+              </h3>
+              <div className="grid gap-4">
+                {items.map((item) => (
+                  <div
+                    key={item._id}
+                    className="p-4 bg-white border rounded-lg shadow-md"
+                  >
+                    <div className="flex justify-between">
+                      <span className="font-medium">{item.title}</span>
+                      <span className="text-green-600 font-semibold">₹{item.amount}</span>
+                    </div>
+                    <p className="text-sm text-gray-500">{item.category}</p>
+                    <p className="text-xs text-gray-400">
+                      {new Date(item.date).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+
+        {filter === "year" &&
+          Object.entries(groupByYear(expenses)).map(([year, months]) => (
+            <div
+              key={year}
+              className="mb-8 border-2 border-green-300 bg-green-50 rounded-2xl p-5 shadow-sm"
+            >
+              <h2 className="text-2xl font-bold text-green-700 mb-4 border-b pb-2">
+                {year}
+              </h2>
+              {Object.entries(months).map(([month, items]) => (
+                <div
+                  key={month}
+                  className="mb-6 bg-white border border-indigo-200 rounded-lg p-4"
+                >
+                  <h3 className="text-lg font-semibold text-indigo-700 mb-3 underline">
+                    {month}
+                  </h3>
+                  <div className="grid gap-4">
+                    {items.map((item) => (
+                      <div
+                        key={item._id}
+                        className="p-4 border border-gray-200 rounded-md shadow-sm bg-gray-50"
+                      >
+                        <div className="flex justify-between">
+                          <span className="font-medium">{item.title}</span>
+                          <span className="text-red-600 font-semibold">₹{item.amount}</span>
+                        </div>
+                        <p className="text-sm text-gray-500">{item.category}</p>
+                        <p className="text-xs text-gray-400">
+                          {new Date(item.date).toLocaleDateString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
       </div>
-    </>
+    </div>
   );
 };
 

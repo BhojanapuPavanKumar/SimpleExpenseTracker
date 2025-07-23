@@ -9,6 +9,8 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { Dashboard } from "./components/Dashboard";
 import { AddExpense } from "./components/AddExpense";
+import { Income } from "./pages/Income";
+import { Expense } from "./pages/Expense";
 
 const App = () => {
     const { appLoading, user} = useAppContext();
@@ -46,8 +48,8 @@ const App = () => {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/signup" element={<HomePage />} />
-                <Route path="/login" element={<HomePage />} />
+                <Route path="/expense" element={<Expense />} />
+                <Route path="/income" element={<Income />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/add-expense" element={<AddExpense />} />

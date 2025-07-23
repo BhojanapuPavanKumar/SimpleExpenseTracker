@@ -8,7 +8,7 @@ import { Navbar } from "../components/navbar";
 
 const ProfilePage = ()=>{
     const navigate=useNavigate();
-    const {user = {}}= useAppContext();
+    const {user = {},setAppLoading}= useAppContext();
     const [isDetails,issetDetails]=useState(true);
     const [updateDetails,setUpdateDetails]=useState({
          name: "",
@@ -17,11 +17,14 @@ const ProfilePage = ()=>{
     })
 
     const getDetails = async()=>{
-        try{
+      try{
             const resp=await axiosInstance.get("/users/details");
+            setAppLoading(false)
             console.log(resp);
-            setUpdateDetails(resp.data.data.user);
+              setUpdateDetails(resp.data.data.user);
+            
         }catch(err){
+            setAppLoading(false);
              ErrorToast(`Cannot Get details: ${err.response?.data?.message || err.message}`);
         }
     }
@@ -32,10 +35,12 @@ const ProfilePage = ()=>{
 
 
     const handleEditDetails = async (e) => {
-        e.preventDefault(); // prevent form reload
 
+        e.preventDefault(); // prevent form reload
+        setAppLoading(true);
         try {
             const result = await axiosInstance.post("/users/details", updateDetails);
+            setAppLoading(false);
             if (result.status === 200 && result.data.isSuccess) {
             SuccessToast(result.data.message);
             issetDetails(true);
@@ -44,6 +49,7 @@ const ProfilePage = ()=>{
             ErrorToast(result.data.message);
             }
         } catch (err) {
+          setAppLoading(false);
             ErrorToast(`Cannot Edit details: ${err.response?.data?.message || err.message}`);
         }
     };
@@ -52,7 +58,6 @@ const ProfilePage = ()=>{
 
     return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-200 relative overflow-hidden">
-      {/* Background animation */}
       <div className="absolute -top-10 -left-10 w-80 h-80 bg-blue-400 rounded-full filter blur-3xl opacity-30 animate-pulse z-0" />
       <div className="absolute bottom-10 right-0 w-72 h-72 bg-purple-400 rounded-full filter blur-3xl opacity-30 animate-pulse z-0" />
       <Navbar />
@@ -73,6 +78,7 @@ const ProfilePage = ()=>{
 
         {isDetails ? (
           <>
+            
             <div className="space-y-4 text-gray-800 text-lg font-medium">
               <p><span className="font-bold">Name:</span> {updateDetails.name}</p>
               <p><span className="font-bold">Email:</span> {updateDetails.email}</p>
@@ -81,12 +87,15 @@ const ProfilePage = ()=>{
             </div>
             <div className="mt-8 text-center">
               <button
-                onClick={() => issetDetails(false)}
+                onClick={() =>{ issetDetails(false);
+                  
+                }}
                 className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-6 py-3 rounded-xl shadow-lg hover:scale-110 hover:shadow-2xl transition-all duration-300"
-              >
+                >
                 Update Details
               </button>
             </div>
+            
           </>
         ) : (
           <form onSubmit={handleEditDetails} className="space-y-5 text-gray-700">

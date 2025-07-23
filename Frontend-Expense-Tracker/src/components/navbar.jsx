@@ -20,7 +20,6 @@ const Navbar = () => {
 
     return (
   <nav className="sticky top-0 z-50 bg-white/70 backdrop-blur-md shadow-xl px-6 py-4 flex justify-between items-center border-b border-white/30">
-    {/* Logo */}
     <Link
       to="/"
       className="text-3xl font-extrabold bg-gradient-to-r from-emerald-500 via-blue-500 to-indigo-500 text-transparent bg-clip-text hover:scale-110 hover:drop-shadow-xl transition-all duration-300"
@@ -28,7 +27,6 @@ const Navbar = () => {
       MyApp
     </Link>
 
-    {/* Navigation Links */}
     <div className="flex items-center gap-6 text-gray-700 font-medium">
       <Link
         to="/"
@@ -36,6 +34,23 @@ const Navbar = () => {
       >
         Home
       </Link>
+      <div className="flex items-center gap-6 text-gray-700 font-medium">
+      <Link
+        to="/expense"
+        className="hover:text-blue-600 hover:scale-110 hover:font-semibold transition-all duration-200"
+      >
+        Expense
+      </Link>
+      </div>
+
+      <div className="flex items-center gap-6 text-gray-700 font-medium">
+      <Link
+        to="/income"
+        className="hover:text-blue-600 hover:scale-110 hover:font-semibold transition-all duration-200"
+      >
+        Income
+      </Link>
+      </div>
 
       {!isAuthenticated ? (
         <div className="flex gap-4 items-center">

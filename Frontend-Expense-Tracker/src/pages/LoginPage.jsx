@@ -2,14 +2,18 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { axiosInstance } from "../axios/axiosInstance";
 import { ErrorToast, SuccessToast } from "../utils/toastHelper";
+import { useAppContext } from "../contexts/appContext";
 
 const LoginPage = () => {
+      const {setAppLoading} = useAppContext();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const handleRegister = async () => {
+      setAppLoading(true);
         try {
             if (!email || !password) {
+                setAppLoading(false);
                 ErrorToast("Email & password are required!");
                 return;
             }
@@ -22,32 +26,32 @@ const LoginPage = () => {
             const result = await axiosInstance.post("/auth/login", dataObj);
 
             if (result.status === 200) {
+                setAppLoading(false);
                 SuccessToast(result.data.message);
                 window.open("/", "_self");
             } else {
+                setAppLoading(false);
                 ErrorToast(result.data.message);
             }
         } catch (err) {
+            setAppLoading(false);
             ErrorToast(`Cannot signup: ${err.response?.data?.message || err.message}`);
         }
     };
 
     return (
   <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-200 via-emerald-100 to-blue-200 p-6 relative overflow-hidden">
-    {/* Glowing Animated Blobs */}
     <div className="absolute inset-0 pointer-events-none">
       <div className="w-96 h-96 bg-emerald-400 rounded-full opacity-30 absolute -top-20 -left-20 blur-3xl animate-pulse"></div>
       <div className="w-80 h-80 bg-indigo-400 rounded-full opacity-20 absolute bottom-0 right-0 blur-2xl animate-pulse"></div>
     </div>
 
-    {/* Glassmorphism Card */}
     <div className="w-full max-w-md p-8 bg-white/80 backdrop-blur-lg shadow-2xl rounded-3xl border border-white/30 relative z-10 transition-all duration-300">
       <h2 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-emerald-600 mb-8">
         Welcome Back
       </h2>
 
       <div className="space-y-6">
-        {/* Email Input */}
         <div className="relative">
           <input
             id="user-email"
@@ -67,7 +71,6 @@ const LoginPage = () => {
           </label>
         </div>
 
-        {/* Password Input */}
         <div className="relative">
           <input
             id="user-password"
@@ -87,7 +90,6 @@ const LoginPage = () => {
           </label>
         </div>
 
-        {/* Login Button */}
         <div className="pt-2">
           <button
             onClick={handleRegister}
@@ -97,7 +99,6 @@ const LoginPage = () => {
           </button>
         </div>
 
-        {/* Switch to Signup */}
         <p className="text-sm text-center text-gray-600 mt-4">
           Don’t have an account?{" "}
           <Link
