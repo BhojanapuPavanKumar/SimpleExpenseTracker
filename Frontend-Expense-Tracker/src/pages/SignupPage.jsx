@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { axiosInstance } from "../axios/axiosInstance";
 import { ErrorToast, SuccessToast } from "../utils/toastHelper";
-import { useAppContext } from "../contexts/appContext";
 
 const SignupPage = () => {
     const [isOtpSent, setIsOtpSent] = useState(false);
@@ -10,10 +9,8 @@ const SignupPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
-    const {setAppLoading}=useAppContext();
 
     const handleRegister = async () => {
-        setAppLoading(true);
         if (isOtpSent) {
             try {
                 if (!email || !password || !otp) {
@@ -30,39 +27,31 @@ const SignupPage = () => {
                 const result = await axiosInstance.post("/auth/signup", dataObj);
 
                 if (result.status === 201) {
-                  setAppLoading(false);
                     SuccessToast(result.data.message);
                     navigate("/login");
                 } else {
-                  setAppLoading(false);
                     ErrorToast(result.data.message);
                 }
             } catch (err) {
-              setAppLoading(false);
                 ErrorToast(`Cannot signup: ${err.response?.data?.message || err.message}`);
             }
         } else {
-          setAppLoading(false);
             ErrorToast(`Cannot signup before sending otp`);
         }
     };
 
     const handleSendOtp = async () => {
-            setAppLoading(true);
         try {
             const resp = await axiosInstance.post("/auth/send-otp", {
                 email,
             });
             if (resp.data.isSuccess) {
-              setAppLoading(false);
                 SuccessToast(resp.data.message);
                 setIsOtpSent(true);
             } else {
-              setAppLoading(false);
                 SuccessToast(resp.data.message);
             }
         } catch (err) {
-          setAppLoading(false);
             console.log(err);
             ErrorToast(`Cannot send otp: ${err.response?.data?.message || err.message}`);
         }
@@ -81,7 +70,6 @@ const SignupPage = () => {
       </h2>
 
       <div className="space-y-6">
-        {/* Email */}
         <div className="relative">
           <input
             id="user-email"
@@ -101,7 +89,6 @@ const SignupPage = () => {
           </label>
         </div>
 
-        {/* OTP & Password */}
         {isOtpSent && (
           <>
             <div className="relative">
@@ -144,7 +131,6 @@ const SignupPage = () => {
           </>
         )}
 
-        {/* Button */}
         <div className="pt-2">
           {isOtpSent ? (
             <button
