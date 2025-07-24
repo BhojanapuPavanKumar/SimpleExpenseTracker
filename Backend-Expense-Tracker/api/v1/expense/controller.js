@@ -67,4 +67,65 @@ const addExpenseController = async (req, res) => {
   }
 };
 
-module.exports = { getAllExpenseController, addExpenseController };
+const editExpenseController = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { id } = req.params;
+    const { title, amount, note, category, date } = req.body;
+
+    const updatedExpense = await ExpenseModel.findOneAndUpdate(
+      { _id: id, user: userId },
+      { title, amount, note, category, date },
+      { new: true }
+    );
+
+    if (!updatedExpense) {
+      return res.status(404).json({
+        isSuccess: false,
+        message: "Expense not found or not authorized",
+      });
+    }
+
+    res.status(200).json({
+      isSuccess: true,
+      message: "Expense updated successfully!",
+      data: updatedExpense,
+    });
+  } catch (error) {
+    handleGenericAPIError("editExpenseController", req, res, error);
+  }
+};
+
+// DELETE an Expense entry by ID
+const deleteExpenseController = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { id } = req.params;
+
+    const deletedExpense = await ExpenseModel.findOneAndDelete({
+      _id: id,
+      user: userId,
+    });
+
+    if (!deletedExpense) {
+      return res.status(404).json({
+        isSuccess: false,
+        message: "Expense not found or not authorized",
+      });
+    }
+
+    res.status(200).json({
+      isSuccess: true,
+      message: "Expense deleted successfully!",
+    });
+  } catch (error) {
+    handleGenericAPIError("ExpenseIncomeController", req, res, error);
+  }
+};
+
+module.exports = {
+  getAllExpenseController,
+  addExpenseController,
+  editExpenseController,
+  deleteExpenseController,
+};

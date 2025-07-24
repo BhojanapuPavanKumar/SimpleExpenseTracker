@@ -6,7 +6,7 @@ import CircularProgressBar from "../components/CircularProgressBar";
 import { useAppContext } from "../contexts/appContext";
 
 const Dashboard = () => {
-  const {setAppLoading}=useAppContext();
+  const { setAppLoading } = useAppContext();
 
   const [expenses, setExpenses] = useState([]);
   const [income, setIncome] = useState([]);
@@ -40,8 +40,17 @@ const Dashboard = () => {
 
   const totalExpense = expenses.reduce((acc, curr) => acc + Number(curr.amount), 0);
   const totalIncome = income.reduce((acc, curr) => acc + Number(curr.amount), 0);
-  const spentPercentage = totalIncome ? Math.min(100, Math.round((totalExpense / totalIncome) * 100)) : 0;
-  const balancePercentage = 100 - spentPercentage;
+
+  const overspentAmount = totalExpense > totalIncome ? totalExpense - totalIncome : 0;
+  const isOverspending = overspentAmount > 0;
+
+  const spentPercentage = totalIncome
+    ? Math.min(100, Math.round((totalExpense / totalIncome) * 100))
+    : totalExpense > 0
+    ? 100
+    : 0;
+
+  const balancePercentage = totalIncome ? Math.max(0, 100 - spentPercentage) : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white p-6">
@@ -57,13 +66,33 @@ const Dashboard = () => {
           </div>
           <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 text-center">
             <h3 className="text-lg font-semibold text-gray-600">Total Expense</h3>
-            <p className="text-2xl text-red-500 font-bold">₹{totalExpense}</p>
+            <p
+              className={`text-2xl font-bold ${
+                totalExpense > totalIncome ? "text-red-800" : "text-red-500"
+              }`}
+            >
+              ₹{totalExpense}
+            </p>
           </div>
           <div className="flex justify-center gap-4">
-            <CircularProgressBar percentage={spentPercentage} color="#f87171" label="Spent" />
-            <CircularProgressBar percentage={balancePercentage} color="#34d399" label="Remaining" />
+            <CircularProgressBar
+              percentage={spentPercentage}
+              color="#f87171"
+              label={isOverspending ? `-₹${overspentAmount}` : "Spent"}
+            />
+            <CircularProgressBar
+              percentage={balancePercentage}
+              color="#34d399"
+              label={isOverspending ? "₹0" : "Remaining"}
+            />
           </div>
         </div>
+
+        {isOverspending && (
+          <p className="text-center text-red-700 font-medium mb-4">
+            ⚠ You are overspending by ₹{overspentAmount}
+          </p>
+        )}
 
         <div className="mb-6 flex justify-center">
           <select

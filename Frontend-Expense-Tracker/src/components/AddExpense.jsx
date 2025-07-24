@@ -16,6 +16,7 @@ const AddExpense = () => {
      setAppLoading(true);
     e.preventDefault();
     if (!title || !amount || !category || !date) {
+      setAppLoading(false);
       ErrorToast("All fields are required");
       return;
     }
