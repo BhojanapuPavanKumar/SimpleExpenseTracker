@@ -16,7 +16,7 @@ const removeJWTToken = (res) => {
   res.cookie("authorization", "", {
     maxAge: 0,
     secure: false, // only sent over https connections
-    sameSite: "None", // only our backend will get this cookie (no other backend can access it)
+    sameSite: "Lax", // only our backend will get this cookie (no other backend can access it)
     httpOnly: true, // frontend will not be able to read this cookie
     // so that our token is out of reach of javascript --> hackers
   });
