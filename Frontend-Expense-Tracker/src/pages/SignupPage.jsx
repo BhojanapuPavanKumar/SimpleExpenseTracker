@@ -26,7 +26,7 @@ const SignupPage = () => {
                     otp,
                 };
 
-                const result = await axiosInstance.post("/auth/signup", dataObj);
+                const result = await axiosInstance.post("/api/v1/auth/signup", dataObj);
 
                 if (result.status === 201) {
                     SuccessToast(result.data.message);
@@ -46,7 +46,7 @@ const SignupPage = () => {
     const handleSendOtp = async () => {
       setLoading(true);
         try {
-            const resp = await axiosInstance.post("/auth/send-otp", {
+            const resp = await axiosInstance.post("/api/v1/auth/send-otp", {
                 email,
             });
             if (resp.data.isSuccess) {
