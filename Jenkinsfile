@@ -9,13 +9,17 @@ pipeline {
     }
 
     triggers {
-        githubPush()  // Auto-trigger on every GitHub commit
+        githubPush()
+    }
+
+    options {
+        retry(2)  // Retry failed steps up to 2 times
     }
 
     stages {
         stage('1️⃣ Checkout Code') {
             steps {
-                echo "🔄 Checking out latest code from GitHub..."
+                echo "🔄 Checking out latest code..."
                 git branch: 'main', url: 'https://github.com/BhojanapuPavanKumar/SimpleExpenseTracker.git'
             }
         }
@@ -24,10 +28,9 @@ pipeline {
             steps {
                 dir('Frontend-Expense-Tracker') {
                     echo "🏗️ Building frontend Docker image..."
-                    sh '''
-                        echo "📦 Starting frontend build..."
-                        docker build -t ${FRONTEND_IMAGE}:latest .
-                    '''
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                        sh 'docker build -t ${FRONTEND_IMAGE}:latest .'
+                    }
                 }
             }
         }
@@ -36,10 +39,7 @@ pipeline {
             steps {
                 dir('Backend-Expense-Tracker') {
                     echo "🏗️ Building backend Docker image..."
-                    sh '''
-                        echo "📦 Starting backend build..."
-                        docker build -t ${BACKEND_IMAGE}:latest .
-                    '''
+                    sh 'docker build -t ${BACKEND_IMAGE}:latest .'
                 }
             }
         }
@@ -48,9 +48,7 @@ pipeline {
             steps {
                 echo "🔐 Logging into DockerHub..."
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh '''
-                        echo $PASS | docker login -u $USER --password-stdin
-                    '''
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
                 }
             }
         }
@@ -67,47 +65,29 @@ pipeline {
 
         stage('6️⃣ Deploy on EC2') {
             steps {
-                echo "🚀 Deploying latest containers on EC2..."
+                echo "🚀 Deploying new containers on EC2..."
                 sshagent(['ec2-ssh-key']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no $EC2_HOST "
-                            echo '🛑 Stopping old containers...'
-                            docker stop expentix_frontend || true
-                            docker stop expentix_backend || true
-
-                            echo '🧹 Removing old containers...'
-                            docker rm expentix_frontend || true
-                            docker rm expentix_backend || true
-
-                            echo '📥 Pulling latest images...'
-                            docker pull ${FRONTEND_IMAGE}:latest
-                            docker pull ${BACKEND_IMAGE}:latest
-
-                            echo '🚀 Starting new containers...'
-                            docker run -d --name expentix_backend -p 2900:2900 ${BACKEND_IMAGE}:latest
+                            docker stop expentix_frontend expentix_backend || true &&
+                            docker rm expentix_frontend expentix_backend || true &&
+                            docker pull ${FRONTEND_IMAGE}:latest &&
+                            docker pull ${BACKEND_IMAGE}:latest &&
+                            docker run -d --name expentix_backend -p 2900:2900 ${BACKEND_IMAGE}:latest &&
                             docker run -d --name expentix_frontend -p 80:80 -e VITE_BACKEND_URL=http://13.126.93.145:2900/api/v1 ${FRONTEND_IMAGE}:latest
-
-                            echo '✅ Deployment complete!'
                         "
                     '''
                 }
-            }
-        }
-
-        stage('7️⃣ Cleanup Docker') {
-            steps {
-                echo "🧹 Cleaning up local Docker cache..."
-                sh 'docker image prune -f'
             }
         }
     }
 
     post {
         success {
-            echo "✅ Build + Push + EC2 Deployment completed successfully!"
+            echo "✅ Build + Push + Deploy completed successfully!"
         }
         failure {
-            echo "❌ Build failed — check console logs for details."
+            echo "❌ Something failed — check logs."
         }
     }
 }
