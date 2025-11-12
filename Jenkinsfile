@@ -8,7 +8,7 @@ pipeline {
     }
 
     triggers {
-        githubPush()   // Automatically trigger on GitHub push
+        githubPush()   // Auto-trigger on GitHub push
     }
 
     stages {
@@ -21,7 +21,7 @@ pipeline {
 
         stage('2️⃣ Build Frontend Image') {
             steps {
-                dir('frontend') {
+                dir('Frontend-Expense-Tracker') {
                     echo "🏗️ Building frontend Docker image..."
                     sh 'docker build -t ${FRONTEND_IMAGE}:latest .'
                 }
@@ -30,7 +30,7 @@ pipeline {
 
         stage('3️⃣ Build Backend Image') {
             steps {
-                dir('backend') {
+                dir('Backend-Expense-Tracker') {
                     echo "🏗️ Building backend Docker image..."
                     sh 'docker build -t ${BACKEND_IMAGE}:latest .'
                 }
