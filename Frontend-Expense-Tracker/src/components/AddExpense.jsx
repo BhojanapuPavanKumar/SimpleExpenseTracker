@@ -22,7 +22,7 @@ const AddExpense = () => {
     }
 
     try {
-      const res = await axiosInstance.post("expense/add", {
+      const res = await axiosInstance.post("/api/v1/expense/add", {
         title,
         amount,
         category,

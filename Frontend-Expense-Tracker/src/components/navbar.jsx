@@ -10,7 +10,7 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         try {
-            await axiosInstance.get("/auth/logout");
+            await axiosInstance.get("/api/v1/auth/logout");
             //todo
             window.location.reload();
         } catch (err) {

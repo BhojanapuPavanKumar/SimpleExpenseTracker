@@ -25,7 +25,7 @@ const AddIncomeForm = ({ onIncomeAdded }) => {
     }
 
     try {
-      const res = await axiosInstance.post("/income/add", form);
+      const res = await axiosInstance.post("/api/v1/income/add", form);
       SuccessToast(res.data.message);
       setForm({ title: "", amount: "", note: "", date: "" });
       if (onIncomeAdded) onIncomeAdded();

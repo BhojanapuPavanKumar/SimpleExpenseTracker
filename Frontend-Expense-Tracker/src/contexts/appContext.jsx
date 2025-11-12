@@ -17,7 +17,7 @@ const AppContextProvider = ({ children }) => {
     const getUserDetails = async () => {
         try {
             setAppLoading(true);
-            const resp = await axiosInstance.get("/users");
+            const resp = await axiosInstance.get("/api/v1/users");
             console.log("user details",resp);
             if (resp.data.isSuccess) {
                 setUser({

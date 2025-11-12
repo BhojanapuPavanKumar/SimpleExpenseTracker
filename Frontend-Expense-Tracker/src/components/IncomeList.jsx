@@ -16,7 +16,7 @@ const IncomeList = () => {
   const fetchIncome = async () => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get("/income/get");
+      const res = await axiosInstance.get("/api/v1/income/get");
       setIncomeData(res.data.data || []);
     } catch (err) {
       ErrorToast(`Failed to fetch income records: ${err.message}`);
@@ -37,7 +37,7 @@ const IncomeList = () => {
 
   const handleEditSubmit = async (id) => {
     try {
-      await axiosInstance.patch(`/income/update/${id}`, editForm);
+      await axiosInstance.patch(`/api/v1/income/update/${id}`, editForm);
       SuccessToast("Income updated successfully!");
       setEditingId(null);
       fetchIncome();
@@ -48,7 +48,7 @@ const IncomeList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axiosInstance.delete(`/income/delete/${id}`);
+      await axiosInstance.delete(`/api/v1/income/delete/${id}`);
       SuccessToast("Income record deleted.");
       fetchIncome();
     } catch (err) {

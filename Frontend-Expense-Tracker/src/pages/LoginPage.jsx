@@ -23,7 +23,7 @@ const LoginPage = () => {
                 password,
             };
 
-            const result = await axiosInstance.post("/auth/login", dataObj);
+            const result = await axiosInstance.post("/api/v1/auth/login", dataObj);
 
             if (result.status === 200) {
                 setAppLoading(false);

@@ -15,7 +15,7 @@ const Dashboard = () => {
   const fetchExpenses = async () => {
     setAppLoading(true);
     try {
-      const res = await axiosInstance.get("/expense/get");
+      const res = await axiosInstance.get("/api/v1/expense/get");
       setExpenses(res.data.data || []);
     } catch (err) {
       ErrorToast(`Failed to fetch expenses: ${err.message}`);
@@ -25,7 +25,7 @@ const Dashboard = () => {
   const fetchIncome = async () => {
     setAppLoading(true);
     try {
-      const res = await axiosInstance.get("/income/get");
+      const res = await axiosInstance.get("/api/v1/income/get");
       setIncome(res.data.data || []);
     } catch (err) {
       ErrorToast(`Failed to fetch income: ${err.message}`);

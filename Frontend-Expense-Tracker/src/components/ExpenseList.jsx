@@ -17,7 +17,7 @@ const ExpenseList = () => {
   const fetchExpenses = async () => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get("/expense/get");
+      const res = await axiosInstance.get("/api/v1/expense/get");
       setExpenseData(res.data.data || []);
     } catch (err) {
       ErrorToast(`Failed to fetch expenses: ${err.message}`);
@@ -28,7 +28,7 @@ const ExpenseList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axiosInstance.delete(`/expense/delete/${id}`);
+      await axiosInstance.delete(`/api/v1/expense/delete/${id}`);
       SuccessToast("Expense deleted successfully!");
       fetchExpenses();
     } catch (err) {
@@ -49,7 +49,7 @@ const ExpenseList = () => {
 
   const handleEditSubmit = async (id) => {
     try {
-      await axiosInstance.patch(`/expense/update/${id}`, editForm);
+      await axiosInstance.patch(`/api/v1/expense/update/${id}`, editForm);
       SuccessToast("Expense updated!");
       setEditingId(null);
       fetchExpenses();

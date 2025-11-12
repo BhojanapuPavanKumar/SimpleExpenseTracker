@@ -18,7 +18,7 @@ const ProfilePage = ()=>{
 
     const getDetails = async()=>{
       try{
-            const resp=await axiosInstance.get("/users/details");
+            const resp=await axiosInstance.get("/api/v1/users/details");
             setAppLoading(false)
             console.log(resp);
               setUpdateDetails(resp.data.data.user);
@@ -39,7 +39,7 @@ const ProfilePage = ()=>{
         e.preventDefault(); // prevent form reload
         setAppLoading(true);
         try {
-            const result = await axiosInstance.post("/users/details", updateDetails);
+            const result = await axiosInstance.post("/api/v1/users/details", updateDetails);
             setAppLoading(false);
             if (result.status === 200 && result.data.isSuccess) {
             SuccessToast(result.data.message);
